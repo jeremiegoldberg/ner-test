@@ -1,29 +1,28 @@
 import json
 import uvicorn
-
+import prometheus_client as prom
+from prometheus_client import Counter, generate_latest
+from fastapi import FastAPI, Request, Response
+from pydantic import BaseModel
+from transformers import pipeline
 from transformers import AutoTokenizer, AutoModelForTokenClassification
 
 tokenizer = AutoTokenizer.from_pretrained("gilf/french-camembert-postag-model")
 model = AutoModelForTokenClassification.from_pretrained("gilf/french-camembert-postag-model")
 
-from transformers import pipeline
-
 nlp_token_class = pipeline('ner', model=model, tokenizer=tokenizer, grouped_entities=True)
-
-from fastapi import FastAPI, Request
-from pydantic import BaseModel
 
 class JsonRequest(BaseModel):
     text: str
 
 app = FastAPI()
 
-#@app.post("/people")
-#async def getNames():
-#    result = json.loads(nlp_token_class(request.json["text"]))
+totalcount = Counter('app.wordclass-api.num_requests', 'The number of requests.')
 
-#    for key in result:
-#      print(key)
+@app.get("/metrics")
+async def metrics():
+    return Response(generate_latest())
+
 
 @app.post("/")
 async def root(data: JsonRequest):
@@ -44,6 +43,8 @@ async def root(data: JsonRequest):
         print(type(data))
 
         #callback = json.loads(result)[0]
+
+        totalcount.inc()
 
         return Dict
 

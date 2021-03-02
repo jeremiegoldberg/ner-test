@@ -1,5 +1,5 @@
 
-FROM rg.fr-par.scw.cloud/netasgard/transformersbase
+FROM transformer-base
 
 RUN echo $PYTHONPATH
 

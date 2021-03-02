@@ -7,7 +7,7 @@ RUN mkdir /python
 
 ENV PYTHONPATH=/python
 
-RUN pip3 install sentencepiece protobuf fastapi uvicorn pydantic
+RUN pip3 install sentencepiece protobuf fastapi uvicorn pydantic prometheus_client
 
 COPY download.py .
 
